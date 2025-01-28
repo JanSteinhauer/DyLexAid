@@ -1,44 +1,76 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var userText: String = """
-In the present state of society, it appears necessary to go back to first principles in search of the most simple truths, and to dispute with some prevailing prejudice every inch of ground. To render women truly virtuous and independent, they must be educated in a manner that does not merely fit them for engaging the affections of a lover, but for developing their own faculties and gaining their own subsistence. For this, they must be permitted to study and understand the world, to reflect on the duties of life, and to be recognized as rational beings whose happiness depends not on the caprice of another, but on their own conduct and choices.
-"""
-    @State private var simplifiedText: String = ""
-    
-    private let simplifier = Simplifier()
-    
+    @State private var selectedView: SelectedView = .typewrite
+
     var body: some View {
-        VStack(spacing: 20) {
-            Text("DyLexAid - Enhanced with Dictionary")
-                .font(.title2)
-                .fontWeight(.bold)
-                .padding(.top, 10)
-            
-            TextEditor(text: $userText)
-                .border(Color.gray, width: 1)
-                .padding()
-                .frame(minHeight: 200)
-            
-            Button("Simplify") {
-                simplifiedText = simplifier.simplify(text: userText)
+        VStack(spacing: 0) {
+            ZStack {
+                switch selectedView {
+                case .typewrite:
+                    TypeWriterView()
+                case .documentupload:
+                    EmptyView()
+                case .information:
+                    EmptyView()
+                }
             }
-            .font(.headline)
-            .padding()
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             
-            Text("Simplified Version:")
-                .font(.headline)
-            
-            ScrollView {
-                Text(simplifiedText)
-                    .padding()
+            VStack {
+                Spacer()
+                
+                HStack {
+                    Spacer()
+                    
+                    Image("TypeWriter")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .onTapGesture {
+                            withAnimation { selectedView = .typewrite }
+                        }
+                        .opacity(selectedView == .typewrite ? 1 : 0.5)
+                    
+                    Spacer()
+                    
+                    Image("DocumentUpload")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .onTapGesture {
+                            withAnimation { selectedView = .documentupload }
+                        }
+                        .opacity(selectedView == .documentupload ? 1 : 0.5)
+                    
+                    Spacer()
+                    
+                    Image("Information")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .onTapGesture {
+                            withAnimation { selectedView = .information }
+                        }
+                        .opacity(selectedView == .information ? 1 : 0.5)
+                    
+                    Spacer()
+                }
+                .padding(.vertical, 10)
+                .padding(.bottom, 20)
+                .background(Color(.systemBackground).shadow(color: .gray.opacity(0.5), radius: 5, x: 0, y: -2))
+                .ignoresSafeArea()
             }
-            .border(Color.gray, width: 1)
-            .frame(minHeight: 180)
-            .padding(.horizontal)
-            
-            Spacer()
+            .ignoresSafeArea()
         }
-        .padding()
+        .ignoresSafeArea(.keyboard, edges: .bottom)
     }
+}
+
+// TODO: In the future typewrite and documentupload together for camerascan. Basically user can scan pages and then to text
+
+enum SelectedView {
+    case typewrite
+    case documentupload
+    case information
 }

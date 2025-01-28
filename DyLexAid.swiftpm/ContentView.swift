@@ -10,7 +10,7 @@ struct ContentView: View {
                 case .typewrite:
                     TypeWriterView()
                 case .documentupload:
-                    EmptyView()
+                    DocumentUploadView()
                 case .information:
                     EmptyView()
                 }

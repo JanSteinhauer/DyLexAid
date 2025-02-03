@@ -18,18 +18,17 @@ struct DocumentUploadView: View {
     @State private var isFilePickerPresented: Bool = false
     @State private var areTogglesVisible: Bool = false
 
-
     private let simplifier = Simplifier()
 
     var body: some View {
         VStack(spacing: 20) {
             Text("DyLexAid - Text Simplification and Accessibility")
-                .font(.largeTitle)
+                .font(.custom("Arial", size: 24))
                 .fontWeight(.semibold)
                 .padding(.top, 20)
 
             Text("Upload your PDF below")
-                .font(.title2)
+                .font(.custom("Arial", size: 18))
                 .fontWeight(.semibold)
 
             // PDF Upload Area
@@ -43,7 +42,7 @@ struct DocumentUploadView: View {
                                 .font(.system(size: 40))
                                 .foregroundColor(.gray)
                             Text("Drag and drop your PDF here or tap to upload")
-                                .font(.body)
+                                .font(.custom("Arial", size: 14))
                                 .foregroundColor(.gray)
                         }
                     )
@@ -58,12 +57,15 @@ struct DocumentUploadView: View {
 
             // Text Editor
             Text("Original Text:")
+                .font(.custom("Arial", size: 16))
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 10)
 
             ZStack(alignment: .topTrailing) {
                 TextEditor(text: $userText)
+                    .font(.custom("Arial", size: 14))
+                    .lineSpacing(1.5)
                     .padding()
                     .background(Color(UIColor.systemGray6))
                     .cornerRadius(12)
@@ -85,37 +87,18 @@ struct DocumentUploadView: View {
                 .padding(10)
             }
 
-
             if areTogglesVisible {
                 HStack(spacing: 20) {
                     Spacer()
-                    
-                    HStack(spacing: 10) {
-                        Text("Lowercase")
-                            .font(.body)
-                        Toggle("", isOn: $isLowercaseEnabled)
-                            .labelsHidden()
-                    }
 
-                    HStack(spacing: 10) {
-                        Text("Replace Words")
-                            .font(.body)
-                        Toggle("", isOn: $isReplaceDifficultWordsEnabled)
-                            .labelsHidden()
-                    }
-
-                    HStack(spacing: 10) {
-                        Text("Summarize")
-                            .font(.body)
-                        Toggle("", isOn: $isSummarizeEnabled)
-                            .labelsHidden()
-                    }
+                    ToggleOption(title: "Lowercase", isEnabled: $isLowercaseEnabled)
+                    ToggleOption(title: "Replace Words", isEnabled: $isReplaceDifficultWordsEnabled)
+                    ToggleOption(title: "Summarize", isEnabled: $isSummarizeEnabled)
 
                     Spacer()
                 }
             }
 
-            
             HStack(spacing: 20) {
                 Button(action: {
                     simplifiedText = simplifier.simplify(text: userText)
@@ -124,6 +107,7 @@ struct DocumentUploadView: View {
                         Image(systemName: "wand.and.stars")
                             .font(.headline)
                         Text(areTogglesVisible ? "Start" : "Simplify")
+                            .font(.custom("Arial", size: 14))
                             .fontWeight(.semibold)
                     }
                     .padding(.vertical, 10)
@@ -136,25 +120,13 @@ struct DocumentUploadView: View {
 
                 Button(action: {
                     areTogglesVisible.toggle()
-                    if isSimplifySelected {
-                        simplifiedText = simplifier.simplify(text: userText)
-                    }
-                    if isLowercaseEnabled {
-                        simplifiedText = simplifiedText.lowercased()
-                    }
-                    if isReplaceDifficultWordsEnabled {
-                        // TODO: Implement replaceDifficultWords
-                        // simplifiedText = simplifier.replaceDifficultWords(text: simplifiedText)
-                    }
-                    if isSummarizeEnabled {
-                        // TODO: add the func to just summarize
-                        // simplifiedText = simplifier.summarize(text: simplifiedText)
-                    }
+                    processText()
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "gear")
                             .font(.headline)
                         Text("Settings")
+                            .font(.custom("Arial", size: 14))
                             .fontWeight(.semibold)
                     }
                     .padding(.vertical, 10)
@@ -168,8 +140,8 @@ struct DocumentUploadView: View {
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.vertical, 10)
 
-
             Text("Simplified Version:")
+                .font(.custom("Arial", size: 16))
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 10)
@@ -177,6 +149,8 @@ struct DocumentUploadView: View {
             ZStack(alignment: .topTrailing) {
                 ScrollView {
                     Text(simplifiedText)
+                        .font(.custom("Arial", size: 14))
+                        .lineSpacing(1.5)
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -253,10 +227,10 @@ struct DocumentUploadView: View {
             text = text.lowercased()
         }
         if isReplaceDifficultWordsEnabled {
-//            text = simplifier.replaceDifficultWords(text: text)
+            // text = simplifier.replaceDifficultWords(text: text)
         }
         if isSummarizeEnabled {
-//            text = simplifier.summarize(text: text)
+            // text = simplifier.summarize(text: text)
         }
         simplifiedText = text
     }
@@ -269,7 +243,7 @@ struct ToggleOption: View {
     var body: some View {
         HStack(spacing: 10) {
             Text(title)
-                .font(.body)
+                .font(.custom("Arial", size: 14))
             Toggle("", isOn: $isEnabled)
                 .labelsHidden()
         }

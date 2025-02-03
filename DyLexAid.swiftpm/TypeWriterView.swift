@@ -21,8 +21,7 @@ struct TypeWriterView: View {
     var body: some View {
         VStack(spacing: 20) {
             Text("DyLexAid - Text Simplification and Accessibility")
-                .font(.largeTitle)
-                .fontWeight(.semibold)
+                .font(.system(size: 24, weight: .semibold, design: .default))
                 .padding(.top, 20)
 
             ZStack(alignment: .topTrailing) {
@@ -32,7 +31,8 @@ struct TypeWriterView: View {
                     .cornerRadius(12)
                     .shadow(radius: 5)
                     .frame(maxWidth: .infinity, minHeight: 200)
-                    .font(.body)
+                    .font(.custom("Arial", size: 14))
+                    .lineSpacing(1.5)
 
                 Button(action: {
                     if let clipboardContent = UIPasteboard.general.string {
@@ -49,104 +49,49 @@ struct TypeWriterView: View {
                 .padding(10)
             }
 
-           
-                
-
             if areTogglesVisible {
                 HStack(spacing: 20) {
                     Spacer()
                     
-                    HStack(spacing: 10) {
-                        Text("Lowercase")
-                            .font(.body)
-                        Toggle("", isOn: $isLowercaseEnabled)
-                            .labelsHidden()
-                    }
-
-                    HStack(spacing: 10) {
-                        Text("Replace Words")
-                            .font(.body)
-                        Toggle("", isOn: $isReplaceDifficultWordsEnabled)
-                            .labelsHidden()
-                    }
-
-                    HStack(spacing: 10) {
-                        Text("Summarize")
-                            .font(.body)
-                        Toggle("", isOn: $isSummarizeEnabled)
-                            .labelsHidden()
-                    }
+                    ToggleOption(title: "Lowercase", isEnabled: $isLowercaseEnabled)
+                    ToggleOption(title: "Replace Words", isEnabled: $isReplaceDifficultWordsEnabled)
+                    ToggleOption(title: "Summarize", isEnabled: $isSummarizeEnabled)
 
                     Spacer()
                 }
             }
 
-            
             HStack(spacing: 20) {
                 Button(action: {
                     simplifiedText = simplifier.simplify(text: userText)
                 }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "wand.and.stars")
-                            .font(.headline)
-                        Text(areTogglesVisible ? "Start" : "Simplify")
-                            .fontWeight(.semibold)
-                    }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 20)
-                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]), startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .shadow(radius: 5)
+                    ActionButton(icon: "wand.and.stars", text: areTogglesVisible ? "Start" : "Simplify")
                 }
 
                 Button(action: {
                     areTogglesVisible.toggle()
-                    if isSimplifySelected {
-                        simplifiedText = simplifier.simplify(text: userText)
-                    }
-                    if isLowercaseEnabled {
-                        simplifiedText = simplifiedText.lowercased()
-                    }
-                    if isReplaceDifficultWordsEnabled {
-                        // TODO: Implement replaceDifficultWords
-                        // simplifiedText = simplifier.replaceDifficultWords(text: simplifiedText)
-                    }
-                    if isSummarizeEnabled {
-                        // TODO: add the func to just summarize
-                        // simplifiedText = simplifier.summarize(text: simplifiedText)
-                    }
+                    processText()
                 }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "gear")
-                            .font(.headline)
-                        Text("Settings")
-                            .fontWeight(.semibold)
-                    }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 20)
-                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]), startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .shadow(radius: 5)
+                    ActionButton(icon: "gear", text: "Settings")
                 }
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.vertical, 10)
 
-            HStack{
+            HStack {
                 Text("Simplified Version:")
                     .fontWeight(.semibold)
                     .padding(.leading, 5)
                 Spacer()
             }
- 
 
             ZStack(alignment: .topTrailing) {
                 ScrollView {
                     Text(simplifiedText)
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .font(.custom("Arial", size: 14))
+                        .lineSpacing(1.5)
                 }
                 .background(Color(UIColor.systemGray6))
                 .cornerRadius(12)
@@ -171,5 +116,44 @@ struct TypeWriterView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding()
+    }
+
+    private func processText() {
+        if isSimplifySelected {
+            simplifiedText = simplifier.simplify(text: userText)
+        }
+        if isLowercaseEnabled {
+            simplifiedText = simplifiedText.lowercased()
+        }
+        if isReplaceDifficultWordsEnabled {
+            // TODO: Implement replaceDifficultWords
+            // simplifiedText = simplifier.replaceDifficultWords(text: simplifiedText)
+        }
+        if isSummarizeEnabled {
+            // TODO: Implement summarize function
+            // simplifiedText = simplifier.summarize(text: simplifiedText)
+        }
+    }
+}
+
+
+
+struct ActionButton: View {
+    var icon: String
+    var text: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.headline)
+            Text(text)
+                .fontWeight(.semibold)
+        }
+        .padding(.vertical, 10)
+        .padding(.horizontal, 20)
+        .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]), startPoint: .topLeading, endPoint: .bottomTrailing))
+        .foregroundColor(.white)
+        .cornerRadius(12)
+        .shadow(radius: 5)
     }
 }

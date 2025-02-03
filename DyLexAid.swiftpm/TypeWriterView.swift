@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct TypeWriterView: View {
     @State private var userText: String = "Type here..."
@@ -17,6 +18,8 @@ struct TypeWriterView: View {
     @State private var areTogglesVisible: Bool = false
 
     private let simplifier = Simplifier()
+    
+    private let speechSynthesizer = AVSpeechSynthesizer()
 
     var body: some View {
         VStack(spacing: 20) {
@@ -65,19 +68,42 @@ struct TypeWriterView: View {
                 Button(action: {
                     simplifiedText = simplifier.simplify(text: userText)
                 }) {
-                    ActionButton(icon: "wand.and.stars", text: areTogglesVisible ? "Start" : "Simplify")
+                    HStack(spacing: 8) {
+                        Image(systemName: "wand.and.stars")
+                            .font(.headline)
+                        Text(areTogglesVisible ? "Start" : "Simplify")
+                            .font(.custom("Arial", size: 14))
+                            .fontWeight(.semibold)
+                    }
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 20)
+                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .shadow(radius: 5)
                 }
 
                 Button(action: {
                     areTogglesVisible.toggle()
                     processText()
                 }) {
-                    ActionButton(icon: "gear", text: "Settings")
+                    HStack(spacing: 8) {
+                        Image(systemName: "gear")
+                            .font(.headline)
+                        Text("Settings")
+                            .font(.custom("Arial", size: 14))
+                            .fontWeight(.semibold)
+                    }
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 20)
+                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .shadow(radius: 5)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.vertical, 10)
-
             HStack {
                 Text("Simplified Version:")
                     .fontWeight(.semibold)
@@ -110,6 +136,20 @@ struct TypeWriterView: View {
                         .shadow(radius: 5)
                 }
                 .padding(15)
+                
+                
+                Button(action: {
+                    speakText(simplifiedText)
+                }) {
+                    Image(systemName: "speaker.3")
+                        .padding(10)
+                        .background(Color.orange.opacity(0.7))
+                        .foregroundColor(.white)
+                        .clipShape(Circle())
+                        .shadow(radius: 5)
+                }
+                .padding(.top, 17)
+                .padding(.trailing, 60)
             }
 
             Spacer()
@@ -134,26 +174,18 @@ struct TypeWriterView: View {
             // simplifiedText = simplifier.summarize(text: simplifiedText)
         }
     }
-}
-
-
-
-struct ActionButton: View {
-    var icon: String
-    var text: String
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.headline)
-            Text(text)
-                .fontWeight(.semibold)
+    
+    private func speakText(_ text: String) {
+        let utterance = AVSpeechUtterance(string: text)
+        
+        if let englishVoice = AVSpeechSynthesisVoice(language: "en-US") {
+            utterance.voice = englishVoice
         }
-        .padding(.vertical, 10)
-        .padding(.horizontal, 20)
-        .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]), startPoint: .topLeading, endPoint: .bottomTrailing))
-        .foregroundColor(.white)
-        .cornerRadius(12)
-        .shadow(radius: 5)
+        else if let fallbackVoice = AVSpeechSynthesisVoice.speechVoices().first {
+            utterance.voice = fallbackVoice
+        }
+        
+        speechSynthesizer.speak(utterance)
     }
+
 }

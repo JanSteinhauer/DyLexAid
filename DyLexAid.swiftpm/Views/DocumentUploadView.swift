@@ -9,16 +9,8 @@ import SwiftUI
 import PDFKit
 
 struct DocumentUploadView: View {
-    @State private var userText: String = ""
-    @State private var simplifiedText: String = ""
-    @State private var isLowercaseEnabled: Bool = false
-    @State private var isReplaceDifficultWordsEnabled: Bool = false
-    @State private var isSimplifySelected: Bool = true
-    @State private var isSummarizeEnabled: Bool = false
+    @StateObject private var viewModel = TextProcessingViewModel()
     @State private var isFilePickerPresented: Bool = false
-    @State private var areTogglesVisible: Bool = false
-
-    private let simplifier = Simplifier()
 
     var body: some View {
         VStack(spacing: 20) {
@@ -31,7 +23,7 @@ struct DocumentUploadView: View {
                 .font(.custom("Arial", size: 18))
                 .fontWeight(.semibold)
 
-            // PDF Upload Area
+            // MARK: - PDF Upload Area
             ZStack {
                 RoundedRectangle(cornerRadius: 12)
                     .fill(Color(UIColor.systemGray6))
@@ -55,15 +47,16 @@ struct DocumentUploadView: View {
             }
             .padding()
 
-            // Text Editor
+            // MARK: - Original Text
             Text("Original Text:")
                 .font(.custom("Arial", size: 16))
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, 10)
 
+            // MARK: - Text Editor with "Paste from Clipboard"
             ZStack(alignment: .topTrailing) {
-                TextEditor(text: $userText)
+                TextEditor(text: $viewModel.userText)
                     .font(.custom("Arial", size: 14))
                     .lineSpacing(1.5)
                     .padding()
@@ -74,7 +67,7 @@ struct DocumentUploadView: View {
 
                 Button(action: {
                     if let clipboardContent = UIPasteboard.general.string {
-                        userText = clipboardContent
+                        viewModel.userText = clipboardContent
                     }
                 }) {
                     Image(systemName: "doc.on.clipboard")
@@ -87,40 +80,43 @@ struct DocumentUploadView: View {
                 .padding(10)
             }
 
-            if areTogglesVisible {
+            // MARK: - Toggles
+            if viewModel.areTogglesVisible {
                 HStack(spacing: 20) {
                     Spacer()
-
-                    ToggleOption(title: "Lowercase", isEnabled: $isLowercaseEnabled)
-                    ToggleOption(title: "Replace Words", isEnabled: $isReplaceDifficultWordsEnabled)
-                    ToggleOption(title: "Summarize", isEnabled: $isSummarizeEnabled)
-
+                    ToggleOption(title: "Lowercase", isEnabled: $viewModel.isLowercaseEnabled)
+                    ToggleOption(title: "Replace Words", isEnabled: $viewModel.isReplaceDifficultWordsEnabled)
+                    ToggleOption(title: "Summarize", isEnabled: $viewModel.isSummarizeEnabled)
                     Spacer()
                 }
             }
 
+            // MARK: - Action Buttons
             HStack(spacing: 20) {
                 Button(action: {
-                    simplifiedText = simplifier.simplify(text: userText)
+                    // We call processText to create simplifiedText
+                    viewModel.processText()
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "wand.and.stars")
                             .font(.headline)
-                        Text(areTogglesVisible ? "Start" : "Simplify")
+                        Text(viewModel.areTogglesVisible ? "Start" : "Simplify")
                             .font(.custom("Arial", size: 14))
                             .fontWeight(.semibold)
                     }
                     .padding(.vertical, 10)
                     .padding(.horizontal, 20)
-                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]),
+                                               startPoint: .topLeading,
+                                               endPoint: .bottomTrailing))
                     .foregroundColor(.white)
                     .cornerRadius(12)
                     .shadow(radius: 5)
                 }
 
                 Button(action: {
-                    areTogglesVisible.toggle()
-                    processText()
+                    viewModel.areTogglesVisible.toggle()
+                    viewModel.processText()
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "gear")
@@ -131,7 +127,9 @@ struct DocumentUploadView: View {
                     }
                     .padding(.vertical, 10)
                     .padding(.horizontal, 20)
-                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]), startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]),
+                                               startPoint: .topLeading,
+                                               endPoint: .bottomTrailing))
                     .foregroundColor(.white)
                     .cornerRadius(12)
                     .shadow(radius: 5)
@@ -140,6 +138,7 @@ struct DocumentUploadView: View {
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.vertical, 10)
 
+            // MARK: - Simplified Version
             Text("Simplified Version:")
                 .font(.custom("Arial", size: 16))
                 .fontWeight(.semibold)
@@ -148,7 +147,7 @@ struct DocumentUploadView: View {
 
             ZStack(alignment: .topTrailing) {
                 ScrollView {
-                    Text(simplifiedText)
+                    Text(viewModel.simplifiedText)
                         .font(.custom("Arial", size: 14))
                         .lineSpacing(1.5)
                         .padding()
@@ -161,7 +160,7 @@ struct DocumentUploadView: View {
                 .padding(.horizontal, 5)
 
                 Button(action: {
-                    UIPasteboard.general.string = simplifiedText
+                    UIPasteboard.general.string = viewModel.simplifiedText
                 }) {
                     Image(systemName: "doc.on.doc")
                         .padding(10)
@@ -181,37 +180,28 @@ struct DocumentUploadView: View {
         }
     }
 
+    // MARK: - PDF Handling
     private func handleFileImport(result: Result<URL, Error>) {
         switch result {
         case .success(let url):
-            if let text = extractTextFromPDF(url: url) {
-                userText = text
+            if let text = PDFExtractor.extractText(from: url) {
+                viewModel.userText = text
             }
         case .failure(let error):
             print("Failed to import file: \(error)")
         }
     }
 
-    private func extractTextFromPDF(url: URL) -> String? {
-        guard let document = PDFDocument(url: url) else { return nil }
-        var extractedText = ""
-        for pageIndex in 0..<document.pageCount {
-            if let page = document.page(at: pageIndex), let pageContent = page.string {
-                extractedText += pageContent
-            }
-        }
-        return extractedText
-    }
-
     private func handleDrop(providers: [NSItemProvider]) -> Bool {
         for provider in providers {
             if provider.hasItemConformingToTypeIdentifier("public.file-url") {
                 provider.loadItem(forTypeIdentifier: "public.file-url", options: nil) { item, _ in
-                    if let urlData = item as? Data, let url = URL(dataRepresentation: urlData, relativeTo: nil) {
-                        if let text = extractTextFromPDF(url: url) {
-                            DispatchQueue.main.async {
-                                userText = text
-                            }
+                    if let urlData = item as? Data,
+                       let url = URL(dataRepresentation: urlData, relativeTo: nil),
+                       let text = PDFExtractor.extractText(from: url) {
+                        
+                        DispatchQueue.main.async {
+                            viewModel.userText = text
                         }
                     }
                 }
@@ -219,33 +209,5 @@ struct DocumentUploadView: View {
             }
         }
         return false
-    }
-
-    private func processText() {
-        var text = userText
-        if isLowercaseEnabled {
-            text = text.lowercased()
-        }
-        if isReplaceDifficultWordsEnabled {
-            // text = simplifier.replaceDifficultWords(text: text)
-        }
-        if isSummarizeEnabled {
-            // text = simplifier.summarize(text: text)
-        }
-        simplifiedText = text
-    }
-}
-
-struct ToggleOption: View {
-    let title: String
-    @Binding var isEnabled: Bool
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Text(title)
-                .font(.custom("Arial", size: 14))
-            Toggle("", isOn: $isEnabled)
-                .labelsHidden()
-        }
     }
 }

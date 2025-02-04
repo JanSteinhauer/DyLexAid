@@ -5,13 +5,26 @@
 //  Created by Steinhauer, Jan on 2/3/25.
 //
 
-import Foundation
 import AVFoundation
+import Combine
+import SwiftUI
 
-class SpeechManager: ObservableObject {
+class SpeechManager: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     private let synthesizer = AVSpeechSynthesizer()
-
+    
+    @Published var highlightedRange: NSRange? = nil
+    
+    private var currentText: String = ""
+    
+    override init() {
+        super.init()
+        synthesizer.delegate = self
+    }
+    
     func speakText(_ text: String) {
+        highlightedRange = nil
+        currentText = text
+        
         let utterance = AVSpeechUtterance(string: text)
         
         if let englishVoice = AVSpeechSynthesisVoice(language: "en-US") {
@@ -22,5 +35,16 @@ class SpeechManager: ObservableObject {
         
         synthesizer.speak(utterance)
     }
+    
+    // MARK: - AVSpeechSynthesizerDelegate
+    
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer,
+                           willSpeakRangeOfSpeechString characterRange: NSRange,
+                           utterance: AVSpeechUtterance) {
+        DispatchQueue.main.async {
+            self.highlightedRange = characterRange
+        }
+    }
 }
+
 

@@ -22,6 +22,7 @@ class AppSettings: ObservableObject {
     @AppStorage("first_time_open") var firstTimeOpen: Bool = true
     @AppStorage("font_size") var fontSize: Int = 24
     @AppStorage("line_spacing") var lineSpacing: Double = 1.5
+    @AppStorage("playback_speed") var playbackSpeed: Double = 1.0
     @AppStorage("font_name") private var fontNameRaw: String = AppFont.defaultFont.rawValue
 
     var fontName: AppFont {

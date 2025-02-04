@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import AVFoundation
 
 struct SimplifiedTextView: View {
     @ObservedObject var viewModel: TextProcessingViewModel
@@ -20,7 +19,7 @@ struct SimplifiedTextView: View {
             
             ZStack(alignment: .topTrailing) {
                 ScrollView {
-                    Text(viewModel.simplifiedText)
+                    AttributedTextView(attributedString: buildHighlightedAttributedString())
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -58,5 +57,24 @@ struct SimplifiedTextView: View {
                 .padding(.trailing, 15)
             }
         }
+    }
+    
+    private func buildHighlightedAttributedString() -> NSAttributedString {
+        let attributed = NSMutableAttributedString(string: viewModel.simplifiedText)
+        
+        if let range = speechManager.highlightedRange,
+           range.location != NSNotFound,
+           range.location + range.length <= attributed.length {
+            
+            attributed.addAttribute(.backgroundColor,
+                                    value: UIColor.yellow,
+                                    range: range)
+            
+            attributed.addAttribute(.font,
+                                    value: UIFont.systemFont(ofSize: UIFont.systemFontSize + 5),
+                                    range: range)
+        }
+        
+        return attributed
     }
 }

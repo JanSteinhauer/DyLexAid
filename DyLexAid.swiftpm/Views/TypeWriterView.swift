@@ -17,9 +17,9 @@ struct TypeWriterView: View {
     var body: some View {
         VStack(spacing: 20) {
             Text("DyLexAid - Text Simplification and Accessibility")
-                .font(.system(size: 24, weight: .semibold))
+                    .font(.system(size: 35, weight: .semibold))
                 .padding(.top, 20)
-
+            
             // MARK: - Original Text Editor
             ZStack(alignment: .topTrailing) {
                 TextEditor(text: $viewModel.userText)
@@ -28,8 +28,6 @@ struct TypeWriterView: View {
                     .cornerRadius(12)
                     .shadow(radius: 5)
                     .frame(maxWidth: .infinity, minHeight: 200)
-                    .font(.custom("Arial", size: 14))
-                    .lineSpacing(1.5)
 
                 Button(action: {
                     if let clipboardContent = UIPasteboard.general.string {
@@ -42,6 +40,7 @@ struct TypeWriterView: View {
                         .foregroundColor(.white)
                         .clipShape(Circle())
                         .shadow(radius: 5)
+                        .font(.system(size: 20))
                 }
                 .padding(10)
             }
@@ -64,9 +63,7 @@ struct TypeWriterView: View {
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "wand.and.stars")
-                            .font(.headline)
                         Text(viewModel.areTogglesVisible ? "Start" : "Simplify")
-                            .font(.custom("Arial", size: 14))
                             .fontWeight(.semibold)
                     }
                     .padding(.vertical, 10)
@@ -85,10 +82,7 @@ struct TypeWriterView: View {
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "gear")
-                            .font(.headline)
                         Text("Settings")
-                            .font(.custom("Arial", size: 14))
-                            .fontWeight(.semibold)
                     }
                     .padding(.vertical, 10)
                     .padding(.horizontal, 20)
@@ -117,8 +111,6 @@ struct TypeWriterView: View {
                     Text(viewModel.simplifiedText)
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .font(.custom("Arial", size: 14))
-                        .lineSpacing(1.5)
                 }
                 .background(Color(UIColor.systemGray6))
                 .cornerRadius(12)
@@ -127,7 +119,6 @@ struct TypeWriterView: View {
                 .padding(.horizontal, 5)
 
                 HStack(spacing: 8) {
-                    // Copy Button
                     Button(action: {
                         UIPasteboard.general.string = viewModel.simplifiedText
                     }) {
@@ -150,6 +141,7 @@ struct TypeWriterView: View {
                             .shadow(radius: 5)
                     }
                 }
+                .font(.system(size: 20))
                 .padding(.top, 17)
                 .padding(.trailing, 15)
             }

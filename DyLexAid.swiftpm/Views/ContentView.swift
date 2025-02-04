@@ -18,6 +18,8 @@ struct ContentView: View {
                 }
             }
             .environmentObject(settings)
+            .font(Font.custom(settings.fontName.rawValue, size: CGFloat(settings.fontSize)))
+            .lineSpacing(CGFloat(settings.lineSpacing))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             VStack {

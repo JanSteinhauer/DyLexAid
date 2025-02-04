@@ -14,7 +14,6 @@ struct ToggleOption: View {
     var body: some View {
         HStack(spacing: 10) {
             Text(title)
-                .font(.custom("Arial", size: 14))
             Toggle("", isOn: $isEnabled)
                 .labelsHidden()
         }

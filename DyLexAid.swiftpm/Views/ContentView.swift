@@ -69,10 +69,23 @@ struct ContentView: View {
             .ignoresSafeArea()
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
+        
+        .sheet(isPresented: Binding(
+            get: { settings.firstTimeOpen },
+            set: { newValue in
+                // When the sheet is dismissed, update firstTimeOpen
+                settings.firstTimeOpen = newValue == false ? false : settings.firstTimeOpen
+            }
+        )) {
+            OnboardingPopupView()
+                .environmentObject(settings)
+                .font(Font.custom(settings.fontName.rawValue, size: CGFloat(settings.fontSize)))
+                .lineSpacing(CGFloat(settings.lineSpacing))
+            
+        }
     }
 }
 
-// TODO: In the future typewrite and documentupload together for camerascan. Basically user can scan pages and then to text
 
 enum SelectedView {
     case typewrite

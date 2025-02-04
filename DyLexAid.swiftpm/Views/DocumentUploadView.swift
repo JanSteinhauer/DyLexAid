@@ -11,6 +11,8 @@ import PDFKit
 struct DocumentUploadView: View {
     @StateObject private var viewModel = TextProcessingViewModel()
     @State private var isFilePickerPresented: Bool = false
+    @EnvironmentObject var settings: AppSettings
+
 
     var body: some View {
         VStack(spacing: 20) {

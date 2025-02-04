@@ -12,6 +12,8 @@ struct TypeWriterView: View {
     @StateObject private var viewModel = TextProcessingViewModel()
     @StateObject private var speechManager = SpeechManager()
     
+    @EnvironmentObject var settings: AppSettings
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("DyLexAid - Text Simplification and Accessibility")

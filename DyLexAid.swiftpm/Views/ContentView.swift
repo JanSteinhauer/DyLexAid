@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedView: SelectedView = .typewrite
+    
+    @StateObject private var settings = AppSettings()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -15,6 +17,7 @@ struct ContentView: View {
                     EmptyView()
                 }
             }
+            .environmentObject(settings)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             
             VStack {

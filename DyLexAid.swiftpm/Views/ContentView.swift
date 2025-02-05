@@ -2,29 +2,31 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedView: SelectedView = .typewrite
-    
     @StateObject private var settings = AppSettings()
-
+    
+    @ViewBuilder
+    private var mainContent: some View {
+        switch selectedView {
+        case .typewrite:
+            TypeWriterView()
+        case .documentupload:
+            DocumentUploadView()
+        case .information:
+            DyslexiaInfoView()
+        }
+    }
+    
     var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                switch selectedView {
-                case .typewrite:
-                    TypeWriterView()
-                case .documentupload:
-                    DocumentUploadView()
-                case .information:
-                    EmptyView()
-                }
-            }
-            .environmentObject(settings)
-            .font(Font.custom(settings.fontName.rawValue, size: CGFloat(settings.fontSize)))
-            .lineSpacing(CGFloat(settings.lineSpacing))
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        ZStack(alignment: .bottom) {
+            mainContent
+                .environmentObject(settings)
+                .font(Font.custom(settings.fontName.rawValue, size: CGFloat(settings.fontSize)))
+                .lineSpacing(CGFloat(settings.lineSpacing))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
             
-            VStack {
+            VStack{
                 Spacer()
-                
                 HStack {
                     Spacer()
                     
@@ -61,19 +63,19 @@ struct ContentView: View {
                     
                     Spacer()
                 }
+                
+                .padding(.bottom, 10)
                 .padding(.vertical, 10)
-                .padding(.bottom, 20)
-                .background(Color(.systemBackground).shadow(color: .gray.opacity(0.5), radius: 5, x: 0, y: -2))
-                .ignoresSafeArea()
+                .ignoresSafeArea(edges: .bottom)
+                .background(Color(.systemBackground) )
             }
-            .ignoresSafeArea()
+           
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         
         .sheet(isPresented: Binding(
             get: { settings.firstTimeOpen },
             set: { newValue in
-                // When the sheet is dismissed, update firstTimeOpen
                 settings.firstTimeOpen = newValue == false ? false : settings.firstTimeOpen
             }
         )) {
@@ -81,7 +83,6 @@ struct ContentView: View {
                 .environmentObject(settings)
                 .font(Font.custom(settings.fontName.rawValue, size: CGFloat(settings.fontSize)))
                 .lineSpacing(CGFloat(settings.lineSpacing))
-            
         }
     }
 }

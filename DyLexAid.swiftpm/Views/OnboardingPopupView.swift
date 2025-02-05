@@ -22,11 +22,13 @@ struct OnboardingPopupView: View {
                 .font(.system(size: 28, weight: .bold))
             
             Text("""
-DyLexAid is an app that helps people with dyslexia read text more easily.
-You can paste, scan, or upload text, then use text-to-speech and simplified reading modes.
-""")
+            DyLexAid is an app that makes it easier to read text and helps people with dyslexia read more easily.
+            You can paste, scan, or upload text, then use text-to-speech and simplified reading modes.
+            """)
             .multilineTextAlignment(.center)
             .padding(.horizontal)
+            .fixedSize(horizontal: false, vertical: true)
+            .layoutPriority(1) 
             
             VStack(spacing: 16) {
                 VStack(alignment: .leading) {
@@ -62,11 +64,12 @@ You can paste, scan, or upload text, then use text-to-speech and simplified read
                 VStack(alignment: .leading, spacing: 8) {
                     
                     HStack {
-                        Text("Choose Font").font(.headline)
+                        Text("Choose Font")
                         Picker("Font", selection: $settings.fontName) {
                             ForEach(AppFont.allCases, id: \.self) { fontOption in
                                 Text(fontOption.rawValue)
-                                    .font(Font.custom(fontOption.rawValue, size: 16))
+                                // TODO: fix that the font size is responsive with the other text
+                                    .font(.system(size: CGFloat(settings.fontSize)))
                                     .tag(fontOption)
                             }
                         }

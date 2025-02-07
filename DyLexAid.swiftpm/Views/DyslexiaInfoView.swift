@@ -3,92 +3,113 @@
 //  DyLexAid
 //
 //  Created by Steinhauer, Jan on 2/5/25.
-//
+//DyslexiaInfoView
 
 import SwiftUI
 
 struct DyslexiaInfoView: View {
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                VStack(spacing: 8) {
-                    Text("Understanding Dyslexia")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .multilineTextAlignment(.center)
-                    
-                    Text("Learn more about dyslexia and how DyLexAid can help.")
-                        .font(.subheadline)
-                        .multilineTextAlignment(.center)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.top, 40)
-                
-                InfoCard(title: "What is Dyslexia?", icon: "book.closed", text: "Dyslexia is a learning difference that affects reading, writing, and spelling. It is not linked to intelligence but to how the brain processes language. With the right support, people with dyslexia can succeed in any field.")
-                
-                InfoCard(title: "Common Symptoms", icon: "text.magnifyingglass", content: {
-                    BulletListView(items: [
-                        "Difficulty recognizing words quickly",
-                        "Challenges with spelling and writing",
-                        "Slow reading speed",
-                        "Struggles with reading comprehension",
-                        "Avoidance of reading-related tasks"
-                    ])
-                })
-                
-                InfoCard(title: "How Can You Help?", icon: "hand.raised", content: {
-                    BulletListView(items: [
-                        "Be patient and supportive",
-                        "Use multi-sensory learning methods",
-                        "Encourage assistive technologies",
-                        "Provide additional time for reading tasks",
-                        "Break tasks into manageable steps"
-                    ])
-                })
-                
-                VStack(spacing: 12) {
-                    VStack{
-                        Text("Empower Learning with DyLexAid")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                        Text("DyLexAid enhances reading by offering text-to-speech, optimized fonts, and structured formatting to improve accessibility. Designed to help individuals with dyslexia, DyLexAid makes reading smoother and more engaging.")
-                            .font(.body)
-                    }
-                        .padding()
-                        .background(Color(UIColor.systemGray6))
-                        .cornerRadius(12)
-                    
-                    Button(action: {
-                    }) {
-                        Label("Explore DyLexAid", systemImage: "arrow.forward.circle.fill")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]),
-                                                       startPoint: .topLeading,
-                                                       endPoint: .bottomTrailing))
-                            .cornerRadius(12)
-                            .shadow(radius: 4)
-                    }
-                    .padding(.horizontal)
-                }
-                
-                InfoCard(title: "Learn More", icon: "link.circle", content: {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Link("International Dyslexia Association", destination: URL(string: "https://dyslexiaida.org")!)
-                        Link("British Dyslexia Association", destination: URL(string: "https://www.bdadyslexia.org.uk")!)
-                        Link("Mayo Clinic - Dyslexia", destination: URL(string: "https://www.mayoclinic.org/diseases-conditions/dyslexia/symptoms-causes/syc-20353552")!)
-                    }
-                    .font(.body)
-                    .foregroundColor(.blue)
-                })
-                
-            }
-            .padding()
-        }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+    @State private var selectedTopic: DyslexiaTopic?
+    @EnvironmentObject var settings: AppSettings
 
-            
+    var body: some View {
+            ScrollView {
+                VStack(spacing: 0) {
+                    ZStack {
+                        LinearGradient(
+                            gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.blue]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .opacity(0.4)
+                        .frame(height: 150)
+                        .ignoresSafeArea(edges: .top)
+
+                        HStack {
+                            Spacer()
+                            VStack {
+                                Text("Accessibility & Dyslexia")
+                                    .font(.system(size: CGFloat(settings.fontSize + 15)))
+                                    .fontWeight(.bold)
+                                    .padding(.top)
+
+                                Text("Understanding dyslexia and how to make reading more accessible for everyone.")
+                                    .font(.body)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                            }
+                            Spacer()
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical)
+                    }
+                    
+                    VStack(alignment: .leading){
+                        HStack{
+                            Text("Overview")
+                                .font(.system(size: CGFloat(settings.fontSize + 8)))
+                                .fontWeight(.semibold)
+                                .padding(.top)
+                                
+                            
+                            Spacer()
+                        }
+                        
+                        Text("Dyslexia affects reading and language processing but isn't linked to intelligence. It stems from how the brain interprets words. With the right support, individuals can improve their reading skills.")
+                            .multilineTextAlignment(.leading)
+
+
+                    }
+                    .padding()
+
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 2), spacing: 20) {
+                        ForEach(DyslexiaTopic.allCases, id: \.self) { topic in
+                            DyslexiaSection(topic: topic, selectedTopic: $selectedTopic)
+                        }
+                    }
+                    .padding()
+                }
+            }
+        
+        .sheet(item: $selectedTopic) { topic in
+            DyslexiaDetailView(topic: topic)
+        }
     }
 }
+
+enum DyslexiaTopic: String, CaseIterable, Identifiable {
+    case whatIsDyslexia, commonSymptoms, howToHelp, appFeatures, additionalResources
+    
+    var id: String { self.rawValue }
+    
+    var title: String {
+        switch self {
+        case .whatIsDyslexia: return "What is Dyslexia?"
+        case .commonSymptoms: return "Common Symptoms"
+        case .howToHelp: return "How to Help?"
+        case .appFeatures: return "How DyLexAid Helps"
+        case .additionalResources: return "Additional Resources"
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .whatIsDyslexia: return "Learn about dyslexia and how it affects reading."
+        case .commonSymptoms: return "Recognize the signs and symptoms of dyslexia."
+        case .howToHelp: return "Ways to support someone with dyslexia."
+        case .appFeatures: return "Assistive tools for improving reading accessibility."
+        case .additionalResources: return "Find more information and support for dyslexia."
+        }
+    }
+    
+    var detailedDescription: String {
+        switch self {
+        case .whatIsDyslexia: return "Dyslexia is a neurological learning difference affecting reading, writing, and spelling. It does not reflect a lack of intelligence or effort."
+        case .commonSymptoms: return "Symptoms include difficulty recognizing words, spelling issues, slow reading speed, and comprehension challenges."
+        case .howToHelp: return "Support strategies include patience, multi-sensory learning, assistive technology, extra time, and breaking tasks into smaller steps."
+        case .appFeatures: return "DyLexAid offers text-to-speech, dyslexia-friendly fonts, structured formatting, and more for better reading accessibility."
+        case .additionalResources: return "Resources like the International Dyslexia Association and British Dyslexia Association offer support, training, and advocacy."
+        }
+    }
+}
+
+

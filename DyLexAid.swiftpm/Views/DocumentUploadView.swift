@@ -17,7 +17,7 @@ struct DocumentUploadView: View {
     var body: some View {
         VStack(spacing: 20) {
             Text("DyLexAid - Text Simplification and Accessibility")
-                .font(.custom("Arial", size: 24))
+                .font(.system(size: CGFloat(settings.fontSize + 15)))
                 .fontWeight(.semibold)
                 .padding(.top, 20)
 

@@ -28,7 +28,6 @@ struct SimplifiedTextView: View {
                 .shadow(radius: 5)
                 .frame(maxWidth: .infinity, minHeight: 180)
                 .padding(.horizontal, 5)
-                
                 HStack(spacing: 8) {
                     Button(action: {
                         UIPasteboard.general.string = viewModel.simplifiedText

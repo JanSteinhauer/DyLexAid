@@ -16,8 +16,10 @@ struct TypeWriterView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            Text("DyLexAid - Text Simplification and Accessibility")
-                .font(.system(size: 35, weight: .semibold))
+            Text("Text Simplification and Accessibility")
+                .font(.system(size: CGFloat(settings.fontSize + 15)))
+                .fontWeight(.semibold)
+                .multilineTextAlignment(.center)
                 .padding(.top, 20)
             
             OriginalTextEditor(viewModel: viewModel)

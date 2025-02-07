@@ -9,7 +9,7 @@ import SwiftUI
 
 struct OnboardingPopupView: View {
     @EnvironmentObject var settings: AppSettings
-
+    @State private var scale: CGFloat = 1.0
     
     var body: some View {
         VStack(spacing: 20) {
@@ -17,13 +17,20 @@ struct OnboardingPopupView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 100, height: 100)
-            
+                .scaleEffect(scale)
+                .animation(
+                    Animation.easeInOut(duration: 1.5)
+                        .repeatForever(autoreverses: true),
+                    value: scale
+                )
+                .onAppear {
+                    scale = 1.2
+                }
             Text("DyLexAid")
                 .font(.system(size: 28, weight: .bold))
             
             Text("""
-            DyLexAid is an app that makes it easier to read text and helps people with dyslexia read more easily.
-            You can paste, scan, or upload text, then use text-to-speech and simplified reading modes.
+            DyLexAid is an app that makes it easier to read text and helps people with dyslexia read more easily. You can paste, scan, or upload text, then use text-to-speech and simplified reading modes.
             """)
             .multilineTextAlignment(.center)
             .padding(.horizontal)

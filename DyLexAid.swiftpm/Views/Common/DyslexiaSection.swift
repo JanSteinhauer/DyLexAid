@@ -17,7 +17,7 @@ struct DyslexiaSection: View {
         
             
             VStack {
-                Image(systemName: "photo")
+                Image(topic.image)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 80, height: 80)

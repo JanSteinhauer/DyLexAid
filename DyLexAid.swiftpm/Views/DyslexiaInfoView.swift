@@ -91,6 +91,16 @@ enum DyslexiaTopic: String, CaseIterable, Identifiable {
         }
     }
     
+    var image: String {
+        switch self {
+        case .whatIsDyslexia:       return "WhatDyslexia"
+        case .commonSymptoms:       return "CommonSyptoms"
+        case .howToHelp:            return "HowCanYouHelp"
+        case .appFeatures:          return "DyLexAidHelps"
+        case .additionalResources:  return "AdditionalResources"
+        }
+    }
+    
     var description: String {
         switch self {
         case .whatIsDyslexia:       return "Learn about dyslexia and how it affects reading."

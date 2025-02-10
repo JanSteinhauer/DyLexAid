@@ -30,7 +30,7 @@ struct ContentView: View {
                 HStack {
                     Spacer()
                     
-                    Image("TypeWriter")
+                    Image("FirstPage")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 30, height: 30)
@@ -41,7 +41,7 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    Image("DocumentUpload")
+                    Image("SecondPage")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 30, height: 30)
@@ -52,7 +52,7 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    Image("Information")
+                    Image("ThirdPage")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 30, height: 30)

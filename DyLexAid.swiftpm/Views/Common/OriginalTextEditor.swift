@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
-
+import PDFKit
 
 struct OriginalTextEditor: View {
     @ObservedObject var viewModel: TextProcessingViewModel
+    @State private var isShowingDocumentPicker = false
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -20,20 +21,42 @@ struct OriginalTextEditor: View {
                 .shadow(radius: 5)
                 .frame(maxWidth: .infinity, minHeight: 200)
             
-            Button(action: {
-                if let clipboardContent = UIPasteboard.general.string {
-                    viewModel.userText = clipboardContent
+            HStack(spacing: 8) {
+                Button(action: {
+                    if let clipboardContent = UIPasteboard.general.string {
+                        viewModel.userText = clipboardContent
+                    }
+                }) {
+                    Image(systemName: "doc.on.clipboard")
+                        .padding(10)
+                        .background(Color.green.opacity(0.7))
+                        .foregroundColor(.white)
+                        .clipShape(Circle())
+                        .shadow(radius: 5)
                 }
-            }) {
-                Image(systemName: "doc.on.clipboard")
-                    .padding(10)
-                    .background(Color.blue.opacity(0.7))
-                    .foregroundColor(.white)
-                    .clipShape(Circle())
-                    .shadow(radius: 5)
-                    .font(.system(size: 20))
+                
+                Button(action: {
+                    isShowingDocumentPicker = true
+                }) {
+                    Image(systemName: "arrow.up.doc")
+                        .padding(10)
+                        .background(Color.orange.opacity(0.7))
+                        .foregroundColor(.white)
+                        .clipShape(Circle())
+                        .shadow(radius: 5)
+                }
             }
-            .padding(10)
+            .font(.system(size: 20))
+            .padding(.top, 17)
+            .padding(.trailing, 15)
+        }
+        .sheet(isPresented: $isShowingDocumentPicker) {
+            DocumentPicker { url in
+                if let text = PDFExtractor.extractText(from: url) {
+                    viewModel.userText = text
+                }
+            }
         }
     }
 }
+

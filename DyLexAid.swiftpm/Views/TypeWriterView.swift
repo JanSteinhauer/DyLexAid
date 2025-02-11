@@ -25,6 +25,7 @@ struct TypeWriterView: View {
                         .padding(.top, 20)
                     
                     OriginalTextEditor(viewModel: viewModel)
+                        .frame(height: geometry.size.height / 2.7)
                     
                     TogglesView(viewModel: viewModel)
                     

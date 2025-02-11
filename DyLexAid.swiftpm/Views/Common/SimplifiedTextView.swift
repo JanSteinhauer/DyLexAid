@@ -11,6 +11,9 @@ struct SimplifiedTextView: View {
     @ObservedObject var viewModel: TextProcessingViewModel
     @ObservedObject var speechManager: SpeechManager
     
+    @EnvironmentObject var settings: AppSettings
+
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text("Simplified Version:")
@@ -61,19 +64,37 @@ struct SimplifiedTextView: View {
     private func buildHighlightedAttributedString() -> NSAttributedString {
         let attributed = NSMutableAttributedString(string: viewModel.simplifiedText)
         
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = CGFloat(settings.lineSpacing)
+        
+        let baseFont = UIFont(name: settings.fontName.rawValue,
+                              size: CGFloat(settings.fontSize))
+                     ?? UIFont.systemFont(ofSize: CGFloat(settings.fontSize))
+        let baseAttributes: [NSAttributedString.Key: Any] = [
+            .font: baseFont,
+            .paragraphStyle: paragraphStyle
+        ]
+        attributed.addAttributes(baseAttributes,
+                                 range: NSRange(location: 0, length: attributed.length))
+        
         if let range = speechManager.highlightedRange,
            range.location != NSNotFound,
            range.location + range.length <= attributed.length {
             
-            attributed.addAttribute(.backgroundColor,
-                                    value: UIColor.yellow,
-                                    range: range)
+            let highlightedFont = UIFont(
+                descriptor: baseFont.fontDescriptor.withSymbolicTraits(.traitBold)
+                          ?? baseFont.fontDescriptor,
+                size: baseFont.pointSize + 6
+            )
             
-            attributed.addAttribute(.font,
-                                    value: UIFont.systemFont(ofSize: UIFont.systemFontSize + 5),
-                                    range: range)
+            attributed.addAttributes([
+                .backgroundColor: UIColor.yellow,
+                .font: highlightedFont
+            ], range: range)
         }
         
         return attributed
     }
+
+
 }

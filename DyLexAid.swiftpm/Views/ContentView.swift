@@ -2,20 +2,23 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedView: SelectedView = .typewrite
-    @StateObject private var settings = AppSettings()
-    
-    @ViewBuilder
-    private var mainContent: some View {
-        switch selectedView {
-        case .typewrite:
-            TypeWriterView()
-        case .documentupload:
-            DocumentUploadView()
-        case .information:
-            DyslexiaInfoView()
+        @StateObject private var settings = AppSettings()
+        @StateObject private var viewModel = TextProcessingViewModel()
+        
+        @ViewBuilder
+        private var mainContent: some View {
+            switch selectedView {
+            case .typewrite:
+                TypeWriterView()
+                    .environmentObject(viewModel)
+            case .documentupload:
+                TextScan(selectedView: $selectedView)
+                    .environmentObject(viewModel)
+            case .information:
+                DyslexiaInfoView()
+            }
         }
-    }
-    
+        
     var body: some View {
         ZStack(alignment: .bottom) {
             mainContent

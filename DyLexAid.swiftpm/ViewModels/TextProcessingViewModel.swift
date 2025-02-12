@@ -23,7 +23,7 @@ class TextProcessingViewModel: ObservableObject {
         
         var output = userText
         
-       
+        
         if isSimplifySelected {
             output = simplifier.simplify(text: output)
         }
@@ -31,13 +31,15 @@ class TextProcessingViewModel: ObservableObject {
         if isLowercaseEnabled {
             output = output.lowercased()
         }
-        
         if isReplaceDifficultWordsEnabled {
-//            output = simplifier.replaceDifficultWords(in: output)
+            output = output
+                .split(separator: " ")
+                .map { word in simplifier.dictionaryReplacement(for: String(word)) ?? String(word) }
+                .joined(separator: " ") 
         }
         
         if isSummarizeEnabled {
-//            output = simplifier.summarize(text: output)
+            //            output = simplifier.summarize(text: output)
         }
         
         simplifiedText = output

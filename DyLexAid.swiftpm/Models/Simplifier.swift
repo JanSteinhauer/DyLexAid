@@ -98,9 +98,8 @@ class Simplifier {
     
     // MARK: - Dictionary Replacement
     
-    /// Looks up `originalWord` in our `customReplacements` (case-insensitive).
-    /// If found, returns a match-cased version. Otherwise, nil.
-    private func dictionaryReplacement(for originalWord: String) -> String? {
+   
+    public func dictionaryReplacement(for originalWord: String) -> String? {
         let lower = originalWord.lowercased()
         guard let replacement = customReplacements[lower] else {
             return nil
@@ -119,10 +118,8 @@ class Simplifier {
             return nil
         }
         
-        // Up to 30 neighbors, sorted by ascending distance
         let candidates = embedding.neighbors(for: vector, maximumCount: 30)
         
-        // Filter out synonyms that don't meet our criteria
         let filtered = candidates.filter { (synonym, distance) in
             let synLower = synonym.lowercased()
             return synLower != lower
@@ -132,7 +129,6 @@ class Simplifier {
                 && synLower.count <= lower.count
         }
         
-        // Pick the first (closest meaning)
         guard let bestMatch = filtered.first else { return nil }
         
         return matchCase(original: original, replacement: bestMatch.0)

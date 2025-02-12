@@ -11,6 +11,7 @@ import PDFKit
 struct OriginalTextEditor: View {
     @ObservedObject var viewModel: TextProcessingViewModel
     @State private var isShowingDocumentPicker = false
+    @State private var isPickerLoading = false
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -36,14 +37,27 @@ struct OriginalTextEditor: View {
                 }
                 
                 Button(action: {
-                    isShowingDocumentPicker = true
+                    isPickerLoading = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        isShowingDocumentPicker = true
+                        isPickerLoading = false
+                    }
                 }) {
-                    Image(systemName: "arrow.up.doc")
-                        .padding(10)
-                        .background(Color.orange.opacity(0.7))
-                        .foregroundColor(.white)
-                        .clipShape(Circle())
-                        .shadow(radius: 5)
+                    if isPickerLoading {
+                        ProgressView()
+                            .padding(10)
+                            .background(Color.orange.opacity(0.7))
+                            .foregroundColor(.white)
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
+                    } else {
+                        Image(systemName: "arrow.up.doc")
+                            .padding(10)
+                            .background(Color.orange.opacity(0.7))
+                            .foregroundColor(.white)
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
+                    }
                 }
             }
             .font(.system(size: 20))
@@ -59,4 +73,3 @@ struct OriginalTextEditor: View {
         }
     }
 }
-

@@ -18,7 +18,8 @@ struct AttributedTextView: UIViewRepresentable {
         textView.textContainer.lineFragmentPadding = 0
         textView.textContainer.widthTracksTextView = true
         textView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        
+        textView.textContainerInset = UIEdgeInsets(top: 10, left: 15, bottom: 10, right: 15)
+
         return textView
     }
     

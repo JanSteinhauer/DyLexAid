@@ -107,7 +107,7 @@ class Summarizer {
         var count = 0
         
         for w in words {
-            if let v = embedding.vector(for: w) {  // 'v' is [Double]
+            if let v = embedding.vector(for: w) { 
                 if vectorSum.isEmpty {
                     vectorSum = v
                 } else {

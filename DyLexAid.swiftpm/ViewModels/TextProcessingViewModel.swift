@@ -12,9 +12,9 @@ class TextProcessingViewModel: ObservableObject {
     @Published var userText: String = "Type here..."
     @Published var simplifiedText: String = ""
     @Published var isSimplifySelected: Bool = true
-    @Published var isLowercaseEnabled: Bool = false
-    @Published var isReplaceDifficultWordsEnabled: Bool = false
-    @Published var isSummarizeEnabled: Bool = false
+    @Published var isLowercaseEnabled: Bool = true
+    @Published var isReplaceDifficultWordsEnabled: Bool = true
+    @Published var isLongSentenceSplittingActive: Bool = false
     @Published var areTogglesVisible: Bool = false
 
     private let simplifier = Simplifier()
@@ -35,11 +35,11 @@ class TextProcessingViewModel: ObservableObject {
             output = output
                 .split(separator: " ")
                 .map { word in simplifier.dictionaryReplacement(for: String(word)) ?? String(word) }
-                .joined(separator: " ") 
+                .joined(separator: " ")
         }
         
-        if isSummarizeEnabled {
-            //            output = simplifier.summarize(text: output)
+        if isLongSentenceSplittingActive {
+            output = simplifier.splitSentences(text: output)
         }
         
         simplifiedText = output

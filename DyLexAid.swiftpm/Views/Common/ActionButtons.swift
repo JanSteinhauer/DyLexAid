@@ -17,7 +17,7 @@ struct ActionButtons: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "wand.and.stars")
-                    Text(viewModel.areTogglesVisible ? "Start" : "Simplify")
+                    Text(viewModel.areTogglesVisible ? "Start" : "Start")
                         .fontWeight(.semibold)
                 }
                 .padding(.vertical, 10)

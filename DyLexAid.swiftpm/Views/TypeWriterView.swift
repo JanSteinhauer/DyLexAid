@@ -27,8 +27,15 @@ struct TypeWriterView: View {
                     OriginalTextEditor(viewModel: viewModel)
                         .frame(height: geometry.size.height / 2.7)
                     
-                    TogglesView(viewModel: viewModel)
-                    
+                    if !settings.firstTimeOpen {
+                        if viewModel.areTogglesVisible {
+                            AppSettingsView(settings: settings)
+                        }
+                        
+                        TogglesView(viewModel: viewModel)
+                            .padding(.horizontal)
+                    }
+                   
                     ActionButtons(viewModel: viewModel)
                     
                     SimplifiedTextView(viewModel: viewModel, speechManager: speechManager)
@@ -40,8 +47,8 @@ struct TypeWriterView: View {
                 
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
-           
+            
         }
-      
+        
     }
 }

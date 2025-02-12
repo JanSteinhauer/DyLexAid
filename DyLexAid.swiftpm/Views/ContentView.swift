@@ -39,7 +39,7 @@ struct ContentView: View {
                         .frame(width: 30, height: 30)
                         .onTapGesture {
                             withAnimation { selectedView = .typewrite }
-                        }
+                            }
                         .opacity(selectedView == .typewrite ? 1 : 0.5)
                     
                     Spacer()
@@ -76,14 +76,16 @@ struct ContentView: View {
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
         
+        
         .sheet(isPresented: Binding(
-            get: { settings.firstTimeOpen },
+            get: { settings.firstTimeOpen},
             set: { newValue in
                 settings.firstTimeOpen = newValue == false ? false : settings.firstTimeOpen
             }
         )) {
             OnboardingPopupView()
                 .environmentObject(settings)
+                .environmentObject(viewModel)
                 .font(Font.custom(settings.fontName.rawValue, size: CGFloat(settings.fontSize)))
                 .lineSpacing(CGFloat(settings.lineSpacing))
         }

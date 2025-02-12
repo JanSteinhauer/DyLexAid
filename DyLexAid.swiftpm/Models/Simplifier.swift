@@ -8,7 +8,6 @@
 import Foundation
 import NaturalLanguage
 
-
 class Simplifier {
     
     private let customReplacements = CustomReplacements.replacements
@@ -21,16 +20,27 @@ class Simplifier {
     func simplify(text: String) -> String {
         let sentences = splitIntoSentences(text)
         
-        let shorterSentences = sentences.flatMap { splitLongSentence($0, maxWords: maxWordsPerChunk) }
-        
-        let simplifiedChunks = shorterSentences.map { rewriteSentence($0) }
+    
+        let simplifiedChunks = sentences.map { rewriteSentence($0) }
         
         return simplifiedChunks.joined(separator: ". ")
     }
     
+    func splitSentences(text: String) -> String {
+        let sentences = splitIntoSentences(text)
+        
+        var allSubSentences: [String] = []
+        for sentence in sentences {
+            let subSentences = splitLongSentenceLogically(sentence, maxWords: maxWordsPerChunk)
+            allSubSentences.append(contentsOf: subSentences)
+        }
+        
+        return allSubSentences.joined(separator: ". ")
+    }
+    
     // MARK: - Sentence Splitting
     
-    private func splitIntoSentences(_ text: String) -> [String] {
+    func splitIntoSentences(_ text: String) -> [String] {
         let tokenizer = NLTokenizer(unit: .sentence)
         tokenizer.string = text
         
@@ -45,18 +55,39 @@ class Simplifier {
         return sentences
     }
     
-    private func splitLongSentence(_ sentence: String, maxWords: Int) -> [String] {
+    
+    private func splitLongSentenceLogically(_ sentence: String, maxWords: Int) -> [String] {
         let words = tokenizeWords(sentence)
+        
         guard words.count > maxWords else { return [sentence] }
+        
+        let punctuationBreakers: Set<Character> = [",", ";", ":", "—", "–"]
+        let conjunctionBreakers: Set<String> = ["and", "but", "or", "so", "yet"]
         
         var result: [String] = []
         var currentChunk: [String] = []
         
-        for word in words {
+        for (index, word) in words.enumerated() {
             currentChunk.append(word)
+            
+            // Always check if we exceeded maxWords in current chunk
             if currentChunk.count >= maxWords {
                 result.append(currentChunk.joined(separator: " "))
                 currentChunk.removeAll()
+                continue
+            }
+            
+            if let lastChar = word.last, punctuationBreakers.contains(lastChar) {
+                if (words.count - (index + 1)) > 2 {
+                    result.append(currentChunk.joined(separator: " "))
+                    currentChunk.removeAll()
+                }
+            }
+            else if conjunctionBreakers.contains(word.lowercased()) {
+                if (words.count - (index + 1)) > 2 {
+                    result.append(currentChunk.joined(separator: " "))
+                    currentChunk.removeAll()
+                }
             }
         }
         
@@ -82,8 +113,7 @@ class Simplifier {
             
             if let directReplacement = dictionaryReplacement(for: originalWord) {
                 rewrittenWords.append(directReplacement)
-            }
-            else {
+            } else {
                 if let simpler = findSimplerSynonym(originalWord, embedding: embedding) {
                     rewrittenWords.append(simpler)
                 } else {
@@ -97,8 +127,6 @@ class Simplifier {
     }
     
     // MARK: - Dictionary Replacement
-    
-   
     public func dictionaryReplacement(for originalWord: String) -> String? {
         let lower = originalWord.lowercased()
         guard let replacement = customReplacements[lower] else {
@@ -113,8 +141,7 @@ class Simplifier {
         
         guard isAlphabetic(lower),
               lower.count >= minWordLengthForSynonym,
-              let vector = embedding.vector(for: lower)
-        else {
+              let vector = embedding.vector(for: lower) else {
             return nil
         }
         

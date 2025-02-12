@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SimplifiedTextView: View {
+    @State private var isSpeakerLoading = false
+    
     @ObservedObject var viewModel: TextProcessingViewModel
     @ObservedObject var speechManager: SpeechManager
     
@@ -38,17 +40,33 @@ struct SimplifiedTextView: View {
                                 .clipShape(Circle())
                                 .shadow(radius: 5)
                         }
-
+                        
+                        
                         Button(action: {
+                            isSpeakerLoading = true
                             speechManager.speakText(viewModel.simplifiedText)
+
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                isSpeakerLoading = false
+                            }
                         }) {
-                            Image(systemName: "speaker.3")
-                                .padding(10)
-                                .background(Color.orange.opacity(0.7))
-                                .foregroundColor(.white)
-                                .clipShape(Circle())
-                                .shadow(radius: 5)
+                            if isSpeakerLoading {
+                                ProgressView()
+                                    .padding(10)
+                                    .background(Color.orange.opacity(0.7))
+                                    .foregroundColor(.white)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 5)
+                            } else {
+                                Image(systemName: "speaker.3")
+                                    .padding(10)
+                                    .background(Color.orange.opacity(0.7))
+                                    .foregroundColor(.white)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 5)
+                            }
                         }
+
                     }
                     .font(.system(size: 20))
                     .padding(.top, 17)

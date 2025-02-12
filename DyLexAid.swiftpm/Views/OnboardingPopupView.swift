@@ -9,6 +9,7 @@ import SwiftUI
 
 struct OnboardingPopupView: View {
     @EnvironmentObject var settings: AppSettings
+    @EnvironmentObject var text_processing_model: TextProcessingViewModel
     @State private var scale: CGFloat = 1.0
     
     var body: some View {
@@ -59,14 +60,6 @@ struct OnboardingPopupView: View {
                     )
                 }
                 
-                VStack(alignment: .leading) {
-                    Text("Playback Speed: \(String(format: "%.1fx", settings.playbackSpeed))")
-                    Slider(
-                        value: $settings.playbackSpeed,
-                        in: 0.5...2.0,
-                        step: 0.1
-                    )
-                }
                 
                 VStack(alignment: .leading, spacing: 8) {
                     
@@ -87,9 +80,12 @@ struct OnboardingPopupView: View {
             }
             .padding(.horizontal)
             
+            TogglesView(viewModel: text_processing_model)
+            
             HStack {
                 Spacer()
                 Button(action: {
+                    text_processing_model.areTogglesVisible = false
                     settings.firstTimeOpen = false
                 }) {
                     Text("Save")
@@ -102,7 +98,10 @@ struct OnboardingPopupView: View {
                         .cornerRadius(8)
                 }
             }
-        }
+        }.onAppear(perform: {
+            text_processing_model.areTogglesVisible = true
+        })
+        
         
         .padding()
         Spacer()

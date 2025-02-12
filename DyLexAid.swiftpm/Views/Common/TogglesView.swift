@@ -12,13 +12,35 @@ struct TogglesView: View {
     
     var body: some View {
         if viewModel.areTogglesVisible {
-            HStack(spacing: 20) {
-                Spacer()
-                ToggleOption(title: "Lowercase", isEnabled: $viewModel.isLowercaseEnabled)
-                ToggleOption(title: "Replace Words", isEnabled: $viewModel.isReplaceDifficultWordsEnabled)
-                ToggleOption(title: "Summarize", isEnabled: $viewModel.isSummarizeEnabled)
-                Spacer()
+            GeometryReader { geometry in
+                let isCompact = geometry.size.width < 600
+                if isCompact {
+                   
+                    HStack{
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack{
+                                ToggleOption(title: "Simplify", isEnabled: $viewModel.isSimplifySelected)
+                                ToggleOption(title: "Lowercase", isEnabled: $viewModel.isLowercaseEnabled)
+                            }
+                            ToggleOption(title: "Replace Words", isEnabled: $viewModel.isReplaceDifficultWordsEnabled)
+                        }
+                        Spacer()
+                    }
+                    .padding(.leading)
+                  
+                    .frame(maxWidth: .infinity)
+                } else {
+                    // Use horizontal layout when there's enough space
+                    HStack(spacing: 20) {
+                        ToggleOption(title: "Simplify", isEnabled: $viewModel.isSimplifySelected)
+                        ToggleOption(title: "Lowercase", isEnabled: $viewModel.isLowercaseEnabled)
+                        ToggleOption(title: "Replace Words", isEnabled: $viewModel.isReplaceDifficultWordsEnabled)
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity)
+                }
             }
+            .frame(height: 50) // Ensures the view does not collapse
         }
     }
 }

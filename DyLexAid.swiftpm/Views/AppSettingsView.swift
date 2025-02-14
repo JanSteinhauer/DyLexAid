@@ -41,15 +41,31 @@ struct AppSettingsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 
                 HStack {
-                    Text("Choose Font")
-                    Picker("Font", selection: $settings.fontName) {
+                    Menu {
                         ForEach(AppFont.allCases, id: \.self) { fontOption in
-                            Text(fontOption.rawValue)
-                                .font(.system(size: CGFloat(settings.fontSize)))
-                                .tag(fontOption)
+                            Button(action: {
+                                settings.fontName = fontOption
+                            }) {
+                                Text(fontOption.rawValue)
+                                    .font(.system(size: CGFloat(settings.fontSize)))
+                            }
                         }
+                    } label: {
+                        HStack {
+                            Text("Choose Font")
+                                .font(.system(size: CGFloat(settings.fontSize)))
+                            Text(settings.fontName.rawValue)
+                                .font(.system(size: CGFloat(settings.fontSize)))
+                                .padding()
+                                .background(Color(UIColor.secondarySystemFill))
+                                .cornerRadius(8)
+                        }
+                        .padding(8)
+                        .foregroundColor(.black)
+                        
+                        Spacer()
                     }
-                    .pickerStyle(.menu)
+                    
                     Spacer()
                 }
             }

@@ -31,7 +31,7 @@ struct OnboardingPopupView: View {
                 .font(.system(size: 28, weight: .bold))
             
             Text("""
-            DyLexAid is an app that makes it easier to read text and helps people with dyslexia read more easily. You can paste, scan, or upload text, then use text-to-speech and simplified reading modes.
+            DyLexAid simplifies reading for people with dyslexia with text-to-speech and accessible reading modes for pasted, scanned, or uploaded text while also promoting awareness and understanding of dyslexia.
             """)
             .multilineTextAlignment(.center)
             .padding(.horizontal)
@@ -64,16 +64,31 @@ struct OnboardingPopupView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     
                     HStack {
-                        Text("Choose Font")
-                        Picker("Font", selection: $settings.fontName) {
+                        Menu {
                             ForEach(AppFont.allCases, id: \.self) { fontOption in
-                                Text(fontOption.rawValue)
-                                // TODO: fix that the font size is responsive with the other text
-                                    .font(.system(size: CGFloat(settings.fontSize)))
-                                    .tag(fontOption)
+                                Button(action: {
+                                    settings.fontName = fontOption
+                                }) {
+                                    Text(fontOption.rawValue)
+                                        .font(.system(size: CGFloat(settings.fontSize)))
+                                }
                             }
+                        } label: {
+                            HStack {
+                                Text("Choose Font")
+                                    .font(.system(size: CGFloat(settings.fontSize)))              
+                                Text(settings.fontName.rawValue)
+                                    .font(.system(size: CGFloat(settings.fontSize)))
+                                    .padding()
+                                    .background(Color(UIColor.secondarySystemFill))
+                                    .cornerRadius(8)
+                            }
+                            .padding(8)
+                            .foregroundColor(.black)
+                            
+                            Spacer()
                         }
-                        .pickerStyle(.menu)
+
                         Spacer()
                     }
                 }
@@ -81,6 +96,7 @@ struct OnboardingPopupView: View {
             .padding(.horizontal)
             
             TogglesView(viewModel: text_processing_model)
+                .padding(.horizontal)
             
             HStack {
                 Spacer()

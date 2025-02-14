@@ -30,7 +30,7 @@ struct AppSettingsView: View {
                     Text("Line Spacing: \(String(format: "%.1f", settings.lineSpacing))")
                     Slider(
                         value: $settings.lineSpacing,
-                        in: 1.0...10.0,
+                        in: 1.0...20.0,
                         step: 0.2
                     )
                 }
